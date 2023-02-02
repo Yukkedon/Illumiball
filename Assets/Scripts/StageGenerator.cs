@@ -25,12 +25,48 @@ public class StageGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // Œ»ÝˆÊ’u‚ÌŽæ“¾
+        int charaPositionIndex = (int)(character.position.z / StageChipSize);
+
+        // 
+        if (charaPositionIndex + preInstantiate > currentChipIndex)
+        {
+            UpdateStage(charaPositionIndex + preInstantiate);
+        }
+
     }
 
-    public void UpdateStage(int preInstantiate)
+    public void UpdateStage(int toChipIndex)
     {
+        if (toChipIndex <= currentChipIndex) return;
 
+        for (int i = currentChipIndex + 1; i <= toChipIndex; i++)
+        {
+            GameObject stageObject = GenerateStage(i);
+
+            generatedStageList.Add(stageObject);
+        }
+
+        while (generatedStageList.Count > preInstantiate + 2) DestroyOldestStage();
+
+        currentChipIndex = toChipIndex;
     }
 
+    GameObject GenerateStage(int chipIndex)
+    {
+        int nextStageChip = Random.Range(0, stageChips.Length);
+
+        GameObject stageObject = (GameObject)Instantiate(
+            stageChips[nextStageChip],
+            new Vector3(0, 0, chipIndex * StageChipSize),
+            Quaternion.identity);
+        return stageObject;
+    }
+
+    void DestroyOldestStage()
+    {
+        GameObject oldstage = generatedStageList[0];
+        generatedStageList.RemoveAt(0);
+        Destroy(oldstage);
+    }
 }
