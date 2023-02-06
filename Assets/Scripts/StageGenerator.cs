@@ -13,7 +13,7 @@ public class StageGenerator : MonoBehaviour
     public int startChipIndex;      // 自動生成スタートチップインデックス
     public int preInstantiate;      // 先読みする数
     public List<GameObject> generatedStageList = new List<GameObject>();
-
+    
 
     // Start is called before the first frame update
     void Start()
@@ -37,12 +37,15 @@ public class StageGenerator : MonoBehaviour
 
     }
 
-    // ステージの更新
+    // indexを渡すことで「設定したindex分のステージを作る」という仕様
+    // どんどんindexを増やしそのindexをStageSizeにかけてあげることで自動生成を実現している
     public void UpdateStage(int toChipIndex)
     {
-        
+        // 作りたい個数(引数 toChipIndex)とプレイヤーの現在地インデックスを比較して
+        // 
         if (toChipIndex <= currentChipIndex) return;
 
+        // 現在地indexから作りたい個数分GanarateStageをする
         for (int i = currentChipIndex + 1; i <= toChipIndex; i++)
         {
             GameObject stageObject = GenerateStage(i);
@@ -50,11 +53,15 @@ public class StageGenerator : MonoBehaviour
             generatedStageList.Add(stageObject);
         }
 
+        // 作りたい個数＋2を超えてステージを作ったら古い順番にステージを削除する
+        // ifでやらないのは万が一複数個出現されて１つしか消えなかった場合に削除してほしいからかも
         while (generatedStageList.Count > preInstantiate + 2) DestroyOldestStage();
-
+        // 現在のステージチップindexを作りたいindexに設定する
         currentChipIndex = toChipIndex;
     }
 
+    // 設定したstageChipsからランダムで取り出し、　
+    // ステージのゲームオブジェクトを返す
     GameObject GenerateStage(int chipIndex)
     {
 
